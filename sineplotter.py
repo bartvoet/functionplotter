@@ -71,12 +71,31 @@ class SinePlotter:
         self.drawCircle(startCircle)
         self.drawPhaseIntoCircle(xAxisPos, startCircle)
 
+class FunctionPlotter:
+    
+    def __init__(self,label,f, color="b"):
+        self.label = label
+        self.f = f
+        self.color = color
+    
+    def draw(self, xAxisPos, startCircle):
+        arrayUntilXPos = arange(0,xAxisPos,0.01)
+        plt.plot(arrayUntilXPos, self.f(arrayUntilXPos), 
+                 self.color, linewidth=0.75)
+    
+    def describe(self, textVertPos, textHorPos, xAxisPos):
+        plt.text(textHorPos, textVertPos, 
+            f"{self.label}",
+            horizontalalignment='left', 
+            verticalalignment='center',
+            color=self.color,
+            size="8")
 class PhasePlotter:
 
     def __init__(self, axis_length):
         self.amp = 0
         self.axis_length = axis_length
-        self.sines = []
+        self.functionPlotters = []
         self.center_circle = 0
 
     def updateAmp(self, amp):
@@ -84,9 +103,13 @@ class PhasePlotter:
             self.amp = amp
             self.center_circle = -1 * self.amp
 
+    def addFunction(self, f):
+        self.functionPlotters.append(f)
+        return self
+
     def addSine(self, amp, phase, period, color = 'r'):
         self.updateAmp(amp)
-        self.sines.append(SinePlotter(phase, amp, period, color))
+        self.functionPlotters.append(SinePlotter(phase, amp, period, color))
         return self
     
     def drawXYAxis(self):
@@ -102,7 +125,7 @@ class PhasePlotter:
         self.drawXYAxis()
         plt.xticks(arange(self.axis_length + 1))    
         # self.removeXYLabels()
-        for count, sine in enumerate(self.sines):
+        for count, sine in enumerate(self.functionPlotters):
             sine.draw(pos, self.center_circle)
             textPos = self.amp + 1 + count / 2
             sine.describe(textPos, self.center_circle * 2, pos)
