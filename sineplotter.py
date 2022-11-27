@@ -7,9 +7,8 @@ from numpy import arange,pi
 
 class SinePlotter:
 
-    def __init__(self, phase, tl, amp, period, color):
+    def __init__(self, phase, amp, period, color):
         self.phase = phase
-        self.tl = tl
         self.color = color
         self.amp = amp
         self.period = period
@@ -36,6 +35,13 @@ class SinePlotter:
     def sin(self, array):
         return self.amp * np.sin( self.angularVelocity() * array + self.phase)
 
+    def drawCircle(self, centerCircle):
+        patch= plt.Circle((centerCircle, 0), 
+                          fill=False, radius= self.amp, 
+                          color=self.color, linestyle="--")
+        plt.gca().add_patch(patch)
+        plt.axis('scaled')
+
     def describe(self, textVertPos, textHorPos, xAxisPos):
         radians = self.xAxisToRad(xAxisPos)
         angleRad = self.xAxisToRad(xAxisPos) % (2 * pi)
@@ -58,20 +64,12 @@ class SinePlotter:
             color=self.color,
             size="8")
 
-    def drawCircle(self, centerCircle):
-        patch= plt.Circle((centerCircle, 0), 
-                          fill=False, radius= self.amp, 
-                          color=self.color, linestyle="--")
-        plt.gca().add_patch(patch)
-        plt.axis('scaled')
-
-    def drawSin(self, xAxisPos, startCircle):
+    def draw(self, xAxisPos, startCircle):
         arrayUntilXPos = arange(0,xAxisPos,0.01)
         plt.plot(arrayUntilXPos, self.sin(arrayUntilXPos), 
                  self.color, linewidth=0.75)
         self.drawCircle(startCircle)
         self.drawPhaseIntoCircle(xAxisPos, startCircle)
-        plt.xticks(arange(self.tl + 1))    
 
 class PhasePlotter:
 
@@ -88,10 +86,7 @@ class PhasePlotter:
 
     def addSine(self, amp, phase, period, color = 'r'):
         self.updateAmp(amp)
-        self.sines.append(
-            SinePlotter(phase, self.axis_length, 
-                        amp, period, color)
-            )
+        self.sines.append(SinePlotter(phase, amp, period, color))
         return self
     
     def drawXYAxis(self):
@@ -105,9 +100,10 @@ class PhasePlotter:
     def draw(self, pos_pct):
         pos = self.axis_length * pos_pct
         self.drawXYAxis()
+        plt.xticks(arange(self.axis_length + 1))    
         # self.removeXYLabels()
         for count, sine in enumerate(self.sines):
-            sine.drawSin(pos, self.center_circle)
+            sine.draw(pos, self.center_circle)
             textPos = self.amp + 1 + count / 2
             sine.describe(textPos, self.center_circle * 2, pos)
 
