@@ -27,7 +27,7 @@ class SinePlotter:
     def drawPhaseIntoCircle(self, xAxisPos, startCircle):
         (real_part, imaginary_part) = self.radToComplex(xAxisPos)
         # Adjust real part because center if circle is shifted
-        real_part_shifted = startCircle - real_part #(real_part - self.amp)
+        real_part_shifted = startCircle + real_part #(real_part - self.amp)
         plt.plot((startCircle, real_part_shifted, xAxisPos     , xAxisPos), 
                  (     0     , imaginary_part   , imaginary_part,    0     ), 
                  self.color + ':' , linewidth=1)
